@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -45,5 +45,25 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    private const DATE_FORMAT = 'Y-m-d H:i:s';
+
+    public function getCreatedAtAttribute($value): string
+    {
+        if ($value instanceof Carbon) {
+            return $value->format(self::DATE_FORMAT);
+        }
+
+        return Carbon::parse($value)->format(self::DATE_FORMAT);
+    }
+
+    public function getUpdatedAtAttribute($value): string
+    {
+        if ($value instanceof Carbon) {
+            return $value->format(self::DATE_FORMAT);
+        }
+
+        return Carbon::parse($value)->format(self::DATE_FORMAT);
     }
 }
