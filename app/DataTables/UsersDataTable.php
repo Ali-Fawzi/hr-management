@@ -20,11 +20,11 @@ class UsersDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function () {
                 return '
-                <a href="users/edit" class="btn btn-primary btn-sm">
-                    <i class="bi bi-pencil"></i>
+                <a href="users/edit" class="btn">
+                    <i class="bi bi-pencil-fill text-primary"></i>
                 </a>
-                <a href="" class="btn btn-danger btn-sm">
-                    <i class="bi bi-trash"></i>
+                <a href="" class="btn">
+                    <i class="bi bi-trash-fill text-danger"></i>
                 </a>
             ';
             })

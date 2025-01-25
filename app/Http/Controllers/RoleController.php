@@ -40,12 +40,11 @@ class RoleController extends Controller implements HasMiddleware
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request): View
+    public function index(): View
     {
-        $roles = Role::orderBy('id', 'DESC')->paginate(5);
+        $roles = Role::with('permissions')->get();
 
-        return view('roles.index', compact('roles'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+        return view('roles.index', ['roles' => $roles]);
     }
 
     /**
@@ -55,9 +54,9 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function create(): View
     {
-        $permission = Permission::get();
+        $permissions = Permission::get();
 
-        return view('roles.create', compact('permission'));
+        return view('roles.create', ['permissions' => $permissions]);
     }
 
     /**
