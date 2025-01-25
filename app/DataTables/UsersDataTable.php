@@ -17,7 +17,18 @@ class UsersDataTable extends DataTable
 
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        return (new EloquentDataTable($query))->setRowId('id');
+        return (new EloquentDataTable($query))
+            ->addColumn('action', function () {
+                return '
+                <a href="users/edit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <a href="" class="btn btn-danger btn-sm">
+                    <i class="bi bi-trash"></i>
+                </a>
+            ';
+            })
+            ->setRowId('id');
     }
 
     public function query(User $model): QueryBuilder
@@ -35,7 +46,6 @@ class UsersDataTable extends DataTable
             ->selectStyleSingle()
             ->buttons([
                 Button::make('add'),
-                Button::make('excel'),
                 Button::make('csv'),
                 Button::make('pdf'),
                 Button::make('print'),
@@ -43,8 +53,10 @@ class UsersDataTable extends DataTable
                 Button::make('reload'),
             ])
             ->parameters([
+                'order' => [[0, 'asc']],
                 'dom' => '<"top mb-2"Bfl>rt<"bottom d-flex align-items-center justify-content-between mt-3"ip>',
-            ]);
+            ])
+            ->select(false);
     }
 
     public function getColumns(): array
@@ -55,6 +67,11 @@ class UsersDataTable extends DataTable
             Column::make('email'),
             Column::make('created_at'),
             Column::make('updated_at'),
+            Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->width(100)
+                ->addClass('text-center no-search'),
         ];
     }
 
