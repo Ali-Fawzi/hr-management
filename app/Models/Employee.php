@@ -2,14 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use RingleSoft\LaravelProcessApproval\Contracts\ApprovableModel;
+use RingleSoft\LaravelProcessApproval\Models\ProcessApproval;
+use RingleSoft\LaravelProcessApproval\Traits\Approvable;
 
-class Employee extends Model
+class Employee extends Model implements ApprovableModel
 {
-    use HasFactory;
-
+    use Approvable;
+    
+    public function onApprovalCompleted(ProcessApproval $approval): bool
+    {
+        return true;   
+    }
     protected $table = 'employee';
 
     protected $primaryKey = 'employee_id';

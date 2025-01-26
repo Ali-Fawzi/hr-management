@@ -8,8 +8,6 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class EmployeesDataTable extends DataTable
@@ -22,7 +20,20 @@ class EmployeesDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'employees.action')
+        ->addColumn('action', function ($employee) {
+            return '
+                <a href="' . route('employees.show', $employee->employee_id) . '" class="btn btn-sm">
+                    <i class="bi bi-eye-fill text-primary"></i>
+                </a>
+            ';
+        })
+        ->editColumn('position', function ($employee) {
+            return $employee->position->title;
+        })
+        ->editColumn('department', function ($employee) {
+            return $employee->department->name;
+        })
+        ->rawColumns(['action'])
             ->setRowId('id');
     }
 
@@ -31,7 +42,7 @@ class EmployeesDataTable extends DataTable
      */
     public function query(Employee $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->with(['department', 'position']);
     }
 
     /**
@@ -45,14 +56,18 @@ class EmployeesDataTable extends DataTable
                     ->minifiedAjax()
                     ->orderBy(1)
                     ->selectStyleSingle()
+                    ->responsive()
                     ->buttons([
-                        Button::make('excel'),
-                        Button::make('csv'),
-                        Button::make('pdf'),
+                        Button::make('add'),
                         Button::make('print'),
                         Button::make('reset'),
-                        Button::make('reload')
-                    ]);
+                        Button::make('reload'),
+                    ])
+                    ->parameters([
+                        'order' => [[0, 'asc']],
+                        'dom' => '<"top mb-2"Bfl>rt<"bottom d-flex align-items-center justify-content-between mt-3"ip>',
+                    ])
+                    ->select(false);
     }
 
     /**
@@ -61,15 +76,20 @@ class EmployeesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('employee_id')->title('id'),
+            Column::make('first_name'),
+            Column::make('last_name'),
+            Column::make('position')
+            ->searchable(false)
+            ->orderable(false),
+            Column::make('department')
+            ->searchable(false)
+            ->orderable(false),
             Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(60)
-                  ->addClass('text-center'),
-            Column::make('id'),
-            Column::make('add your columns'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+                ->exportable(false)
+                ->printable(false)
+                ->width(100)
+                ->addClass('text-center no-search'),
         ];
     }
 

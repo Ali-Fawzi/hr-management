@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Registering new employee to the system') }}
+            {{ __('Updating Employee Information') }}
         </h2>
     </x-slot>
 
@@ -17,30 +17,31 @@
                     <section>
                         <!-- Form Title -->
                         <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
-                            Register new employee
+                            Update Employee Information
                         </h1>
 
-                        <form method="POST" action="{{ route('employees.store') }}" class="grid-cols-1 md:grid-cols-2 gap-4 grid" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('employees.update', $employee->employee_id) }}" class="grid-cols-1 md:grid-cols-2 gap-4 grid" enctype="multipart/form-data">
                             @csrf
+                            @method('PUT')
                         
                             <!-- First Name -->
                             <div>
                                 <x-input-label for="first_name" :value="__('First Name')" />
-                                <x-text-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name')" required autofocus autocomplete="first_name" />
+                                <x-text-input id="first_name" class="block mt-1 w-full" type="text" name="first_name" :value="old('first_name', $employee->first_name)" required autofocus autocomplete="first_name" />
                                 <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
                             </div>
                         
                             <!-- Last Name -->
                             <div>
                                 <x-input-label for="last_name" :value="__('Last Name')" />
-                                <x-text-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name')" required autocomplete="last_name" />
+                                <x-text-input id="last_name" class="block mt-1 w-full" type="text" name="last_name" :value="old('last_name', $employee->last_name)" required autocomplete="last_name" />
                                 <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
                             </div>
                         
                             <!-- Date of Birth -->
                             <div>
                                 <x-input-label for="date_of_birth" :value="__('Date of Birth')" />
-                                <x-text-input id="date_of_birth" class="block mt-1 w-full" type="date" name="date_of_birth" :value="old('date_of_birth')" required />
+                                <x-text-input id="date_of_birth" class="block mt-1 w-full" type="date" name="date_of_birth" :value="old('date_of_birth', $employee->date_of_birth)" required />
                                 <x-input-error :messages="$errors->get('date_of_birth')" class="mt-2" />
                             </div>
                         
@@ -49,8 +50,8 @@
                                 <x-input-label for="gender" :value="__('Gender')" />
                                 <select id="gender" name="gender" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                                     <option value="">Select Gender</option>
-                                    <option value="Male" {{ old('gender') == 'Male' ? 'selected' : '' }}>Male</option>
-                                    <option value="Female" {{ old('gender') == 'Female' ? 'selected' : '' }}>Female</option>
+                                    <option value="Male" {{ old('gender', $employee->gender) == 'Male' ? 'selected' : '' }}>Male</option>
+                                    <option value="Female" {{ old('gender', $employee->gender) == 'Female' ? 'selected' : '' }}>Female</option>
                                 </select>
                                 <x-input-error :messages="$errors->get('gender')" class="mt-2" />
                             </div>
@@ -58,7 +59,7 @@
                             <!-- Hire Date -->
                             <div>
                                 <x-input-label for="hire_date" :value="__('Hire Date')" />
-                                <x-text-input id="hire_date" class="block mt-1 w-full" type="date" name="hire_date" :value="old('hire_date')" required />
+                                <x-text-input id="hire_date" class="block mt-1 w-full" type="date" name="hire_date" :value="old('hire_date', $employee->hire_date)" required />
                                 <x-input-error :messages="$errors->get('hire_date')" class="mt-2" />
                             </div>
                         
@@ -68,7 +69,7 @@
                                 <select id="department_id" name="department_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                                     <option value="">Select Department</option>
                                     @foreach($departments as $department)
-                                        <option value="{{ $department->department_id }}" {{ old('department_id') == $department->department_id ? 'selected' : '' }}>{{ $department->name }}</option>
+                                        <option value="{{ $department->department_id }}" {{ old('department_id', $employee->department_id) == $department->department_id ? 'selected' : '' }}>{{ $department->name }}</option>
                                     @endforeach
                                 </select>
                                 <x-input-error :messages="$errors->get('department_id')" class="mt-2" />
@@ -80,7 +81,7 @@
                                 <select id="position_id" name="position_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required>
                                     <option value="">Select Position</option>
                                     @foreach($positions as $position)
-                                        <option value="{{ $position->position_id }}" {{ old('position_id') == $position->position_id ? 'selected' : '' }}>{{ $position->title }}</option>
+                                        <option value="{{ $position->position_id }}" {{ old('position_id', $employee->position_id) == $position->position_id ? 'selected' : '' }}>{{ $position->title }}</option>
                                     @endforeach
                                 </select>
                                 <x-input-error :messages="$errors->get('position_id')" class="mt-2" />
@@ -89,7 +90,7 @@
                             <!-- Salary -->
                             <div>
                                 <x-input-label for="salary" :value="__('Salary in IQD')" />
-                                <x-text-input id="salary" class="block mt-1 w-full" type="number" name="salary" :value="old('salary')" required />
+                                <x-text-input id="salary" class="block mt-1 w-full" type="number" name="salary" :value="old('salary', $employee->salary)" required />
                                 <x-input-error :messages="$errors->get('salary')" class="mt-2" />
                             </div>
                         
@@ -124,7 +125,7 @@
                             <!-- Submit Button -->
                             <div>
                                 <x-primary-button>
-                                    {{ __('Register Employee') }}
+                                    {{ __('Update Employee') }}
                                 </x-primary-button>
                             </div>
                         </form>

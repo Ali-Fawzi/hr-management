@@ -16,9 +16,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::resource('employees', EmployeeController::class);
     Route::resource('roles', RoleController::class, ['except' => ['show']]);
     Route::resource('users', UserController::class, ['except' => ['show']]);
-    Route::resource('employees', EmployeeController::class , ['except' => ['show']]);
     Route::resource('positions', PositionController::class, ['except' => ['show']]);
     Route::resource('departments', DepartmentController::class, ['except' => ['show']]);
 });
