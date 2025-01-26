@@ -9,9 +9,20 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 relative overflow-x-auto">
-                    <div class="flex justify-start mb-4">
-                        <a href="{{ route('roles.create') }}" class="btn btn-primary">
-                            Create Role
+                    <div class="flex justify-between mb-4">
+                        @if (session('success'))
+                            <p
+                                x-data="{ show: true }"
+                                x-show="show"
+                                x-transition
+                                x-init="setTimeout(() => show = false, 2000)"
+                                class="text-sm text-green-500"
+                            >{{ __(session('success')) }}</p>
+                        @endif
+                        <a href="{{ route('roles.create') }}" class="ml-auto">
+                            <x-secondary-button>
+                                Create Role
+                            </x-secondary-button>
                         </a>
                     </div>
                     <table class="w-full text-sm text-left text-gray-500">
@@ -41,18 +52,16 @@
                                             </span>
                                         @endforeach
                                     </td>
-                                    <td class="px-6 py-4 w-1/6 space-x-4">
+                                    <td class="px-6 py-4 w-1/6 space-x-2">
                                         <a href="{{ route('roles.edit', $role->id) }}">
                                             <i class="bi bi-pencil-fill text-primary"></i>
                                         </a>
-
-                                        <form action="{{ route('roles.destroy', $role->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit">
-                                                <i class="bi bi-trash-fill text-danger"></i>
-                                            </button>
-                                        </form>
+                                        <button 
+                                        x-data=""
+                                        onClick="setDeleteModalActionUrl('role', {{ $role->id }})"
+                                        x-on:click.prevent="$dispatch('open-modal', 'confirm-role-deletion')">
+                                            <i class="bi bi-trash-fill text-danger"></i>
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -62,4 +71,33 @@
             </div>
         </div>
     </div>
+    <x-modal name="confirm-role-deletion" :show="$errors->roleDeletion->isNotEmpty()" focusable>
+        <form method="post" class="p-6" id="deleteForm">
+            @csrf
+            @method('delete')
+
+            <h2 class="text-lg font-medium text-gray-900">
+                {{ __('Are you sure you want to delete this role?') }}
+            </h2>
+
+            <p class="mt-1 text-sm text-gray-600">
+                {{ __('Once the role deleted, all of its resources and data will be permanently deleted. Please confirm you would like to permanently delete your this role.') }}
+            </p>
+
+            <div class="mt-6 flex justify-end">
+                <x-secondary-button x-on:click="$dispatch('close')">
+                    {{ __('Cancel') }}
+                </x-secondary-button>
+
+                <x-danger-button class="ms-3">
+                    {{ __('Delete Role') }}
+                </x-danger-button>
+            </div>
+        </form>
+    </x-modal>
 </x-app-layout>
+<script>
+    function setDeleteModalActionUrl(resource, id) {
+        document.getElementById('deleteForm').action = `/${resource}s/${id}`;
+    }
+</script>

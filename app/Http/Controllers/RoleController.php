@@ -86,22 +86,6 @@ class RoleController extends Controller implements HasMiddleware
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id): View
-    {
-        $role = Role::find($id);
-        $rolePermissions = Permission::join('role_has_permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
-            ->where('role_has_permissions.role_id', $id)
-            ->get();
-
-        return view('roles.show', compact('role', 'rolePermissions'));
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -110,12 +94,12 @@ class RoleController extends Controller implements HasMiddleware
     public function edit($id): View
     {
         $role = Role::find($id);
-        $permission = Permission::get();
+        $permissions = Permission::get();
         $rolePermissions = DB::table('role_has_permissions')->where('role_has_permissions.role_id', $id)
             ->pluck('role_has_permissions.permission_id', 'role_has_permissions.permission_id')
             ->all();
 
-        return view('roles.edit', compact('role', 'permission', 'rolePermissions'));
+        return view('roles.edit', compact('role', 'permissions', 'rolePermissions'));
     }
 
     /**
@@ -126,7 +110,7 @@ class RoleController extends Controller implements HasMiddleware
      */
     public function update(Request $request, $id): RedirectResponse
     {
-        $request->validate($request, [
+        $request->validate([
             'name' => 'required',
             'permission' => 'required',
         ]);

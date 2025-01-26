@@ -18,22 +18,22 @@ class UsersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', function () {
+            ->addColumn('action', function (User $user) {
                 return '
-                <a href="users/edit" class="btn">
-                    <i class="bi bi-pencil-fill text-primary"></i>
-                </a>
-                <a href="" class="btn">
-                    <i class="bi bi-trash-fill text-danger"></i>
-                </a>
+                    <a href="users/'.$user->id.'/edit" class="btn">
+                        <i class="bi bi-pencil-fill text-primary"></i>
+                    </a>
             ';
+            })
+            ->editColumn('role', function (User $user) {
+                return $user->roles->first()->name;
             })
             ->setRowId('id');
     }
 
     public function query(User $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->newQuery()->with('roles');
     }
 
     public function html(): HtmlBuilder
@@ -65,8 +65,7 @@ class UsersDataTable extends DataTable
             Column::make('id'),
             Column::make('name'),
             Column::make('email'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+            Column::make('role'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

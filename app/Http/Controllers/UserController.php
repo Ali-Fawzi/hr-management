@@ -6,7 +6,6 @@ use App\DataTables\UsersDataTable;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
@@ -57,20 +56,7 @@ class UserController extends Controller
         $user->assignRole($request->input('roles'));
 
         return redirect()->route('users.index')
-            ->with('success', 'User created successfully');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id): View
-    {
-        $user = User::find($id);
-
-        return view('users.show', compact('user'));
+            ->with('success', 'User added successfully');
     }
 
     /**
@@ -99,16 +85,10 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
-            'password' => 'same:confirm-password',
             'roles' => 'required',
         ]);
 
         $input = $request->all();
-        if (! empty($input['password'])) {
-            $input['password'] = Hash::make($input['password']);
-        } else {
-            $input = Arr::except($input, ['password']);
-        }
 
         $user = User::find($id);
         $user->update($input);
