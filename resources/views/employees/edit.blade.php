@@ -9,10 +9,17 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <div class="flex justify-start mb-4">
+                    <div class="flex justify-between mb-4">
                         <a class="btn" href="{{ route('employees.index') }}">
                             <i class="bi bi-chevron-left"></i>
                         </a>
+                        <form action="{{route('employees.destroy', $employee->employee_id)}}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm" onclick="return confirm('Are you sure you want to delete this employee?')">
+                                <i class="bi bi-trash-fill text-danger"></i>
+                            </button>
+                        </form>
                     </div>
                     <section>
                         <!-- Form Title -->

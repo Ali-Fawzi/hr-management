@@ -8,6 +8,8 @@ use App\Models\Employee;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Department;
 use App\Models\Position;
+use Illuminate\Support\Facades\Auth;
+use RingleSoft\LaravelProcessApproval\Models\ProcessApproval;
 
 class EmployeeController extends Controller
 {
@@ -35,7 +37,6 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the request data
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -51,7 +52,6 @@ class EmployeeController extends Controller
             'photo_path' => 'nullable|image|mimes:jpg,png|max:2048',
         ]);
     
-        // Handle file uploads
         if ($request->hasFile('driving_license_path')) {
             $validatedData['driving_license_path'] = $request->file('driving_license_path')->store('driving_licenses', 'public');
         }
@@ -68,9 +68,17 @@ class EmployeeController extends Controller
             $validatedData['photo_path'] = $request->file('photo_path')->store('photos', 'public');
         }
     
-        Employee::create($validatedData);
-    
-        return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
+        $employee = new Employee($validatedData);
+
+        dd(Employee::submitted()); // true or false
+
+        $result = $employee->submit();
+
+        if ($result instanceof ProcessApproval) {
+            return redirect()->route('employees.index')->with('success', 'Employee submitted for approval.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to submit employee for approval.');
+        }
     }
 
     /**
