@@ -10,20 +10,20 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @if (session('success'))
-                            <p
-                                x-data="{ show: true }"
-                                x-show="show"
-                                x-transition
-                                x-init="setTimeout(() => show = false, 2000)"
-                                class="text-sm text-green-500"
-                            >{{ __(session('success')) }}</p>
-                        @endif
+                        <p
+                            x-data="{ show: true }"
+                            x-show="show"
+                            x-transition
+                            x-init="setTimeout(() => show = false, 2000)"
+                            class="text-sm text-green-500"
+                        >{{ __(session('success')) }}</p>
+                    @endif
                     {{ $dataTable->table() }}
                 </div>
             </div>
         </div>
     </div>
     @push('scripts')
-        {{ $dataTable->scripts(attributes: ['type' => 'module']) }}
+        {{ $dataTable->scripts() }}
     @endpush
 </x-app-layout>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTables\RolesDataTable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -40,11 +41,9 @@ class RoleController extends Controller implements HasMiddleware
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(): View
+    public function index(RolesDataTable $dataTable)
     {
-        $roles = Role::with('permissions')->get();
-
-        return view('roles.index', ['roles' => $roles]);
+        return $dataTable->render('departments.index');
     }
 
     /**

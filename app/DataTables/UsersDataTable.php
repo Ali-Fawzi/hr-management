@@ -20,14 +20,15 @@ class UsersDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function (User $user) {
                 return '
-                    <a href="users/'.$user->id.'/edit" class="btn">
-                        <i class="bi bi-pencil-fill text-primary"></i>
-                    </a>
+                <a href="users/'.$user->id.'/edit" class="btn">
+                    <i class="bi bi-pencil-fill text-primary"></i>
+                </a>
             ';
             })
             ->editColumn('role', function (User $user) {
-                return $user->roles->first()->name;
+                return '<span class="badge bg-success">'.ucfirst($user->roles->first()->name).'</span>';
             })
+            ->rawColumns(['action', 'role'])
             ->setRowId('id');
     }
 
@@ -44,6 +45,7 @@ class UsersDataTable extends DataTable
             ->minifiedAjax()
             ->orderBy(1)
             ->selectStyleSingle()
+            ->responsive()
             ->buttons([
                 Button::make('add'),
                 Button::make('csv'),
@@ -65,7 +67,9 @@ class UsersDataTable extends DataTable
             Column::make('id'),
             Column::make('name'),
             Column::make('email'),
-            Column::make('role'),
+            Column::make('role')
+            ->searchable(false)
+            ->orderable(false),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

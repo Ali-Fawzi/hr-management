@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b77bf472f6b22159e9d512e0ca971f99",
+    "content-hash": "eeb64950fffdc01a4befab93fa30b2da",
     "packages": [
         {
             "name": "brick/math",
@@ -3825,6 +3825,75 @@
                 }
             ],
             "time": "2024-04-27T21:32:50+00:00"
+        },
+        {
+            "name": "ringlesoft/laravel-process-approval",
+            "version": "1.0.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ringlesoft/laravel-process-approval.git",
+                "reference": "b107057bfcac168cbbea522abd27d3c44d1fe0de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ringlesoft/laravel-process-approval/zipball/b107057bfcac168cbbea522abd27d3c44d1fe0de",
+                "reference": "b107057bfcac168cbbea522abd27d3c44d1fe0de",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/auth": "^10.0|^11.0",
+                "illuminate/broadcasting": "^10.7|^11.0",
+                "illuminate/database": "^10.0|^11.0",
+                "illuminate/routing": "^10.24|^11.0",
+                "php": ">=8.1"
+            },
+            "require-dev": {
+                "roave/security-advisories": "dev-latest"
+            },
+            "type": "laravel-package",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "ProcessApproval": "RingleSoft\\LaravelProcessApproval\\Facade"
+                    },
+                    "providers": [
+                        "RingleSoft\\LaravelProcessApproval\\LaravelProcessApprovalServiceProvider"
+                    ],
+                    "dont-discover": []
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "RingleSoft\\LaravelProcessApproval\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "David Ringle",
+                    "email": "ringunger@gmail.com",
+                    "homepage": "https://ringlesoft.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A package to handle process approval flow in a laravel application.",
+            "homepage": "https://ringlesoft.com/packages/laravel-process-approval",
+            "keywords": [
+                "approval",
+                "approve",
+                "flow",
+                "laravel",
+                "procedure",
+                "ringlesoft"
+            ],
+            "support": {
+                "issues": "https://github.com/ringlesoft/laravel-process-approval/issues",
+                "source": "https://github.com/ringlesoft/laravel-process-approval/tree/1.0.9"
+            },
+            "time": "2024-10-07T10:04:10+00:00"
         },
         {
             "name": "spatie/laravel-permission",

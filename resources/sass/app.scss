@@ -10,7 +10,94 @@
 @import "datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css";
 @import "datatables.net-select-bs5/css/select.bootstrap5.css";
 
+#positions-table_wrapper {
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+#positions-table {
+    width: 100% !important;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+#positions-table th,
+#positions-table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+#positions-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+#positions-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+#positions-table tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+#positions-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+#positions-table tbody tr:nth-child(even):hover {
+    background-color: #f1f3f5;
+}
+
+.btn {
+    margin: 2px;
+    font-size: 0.875rem;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-info {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-info:hover,
+.btn-warning:hover,
+.btn-danger:hover {
+    opacity: 0.9;
+}
+
 a {
     color: #3490dc;
     text-decoration: none;
+}
+
+
+@media (max-width: 768px) {
+    #positions-table_wrapper {
+        overflow-x: auto;
+    }
+
+    #positions-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
 }
