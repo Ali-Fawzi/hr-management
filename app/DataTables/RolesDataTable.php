@@ -34,7 +34,10 @@ class RolesDataTable extends DataTable
                     </form>
                 ';
             })
-            ->rawColumns(['action'])
+            ->editColumn('permissions', function ($role) {
+                return '<span class="badge bg-success">' . $role->permissions->pluck('name')->implode('</span> <span class="badge bg-success">') . '</span>';
+            })
+            ->rawColumns(['action', 'permissions'])
             ->setRowId('id');
     }
 
@@ -43,7 +46,7 @@ class RolesDataTable extends DataTable
      */
     public function query(Role $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->with('permissions');
     }
 
     /**
@@ -81,6 +84,10 @@ class RolesDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
+            Column::make('permissions')
+            ->width(640)
+            ->sortable(false)
+            ->searchable(false),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)

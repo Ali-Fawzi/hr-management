@@ -40,14 +40,6 @@ class PositionController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Position $position)
-    {
-        return view('positions.show', compact('position'));
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Position $position)

@@ -40,14 +40,6 @@ class DepartmentController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Department $department)
-    {
-        return view('departments.show', compact('department'));
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Department $department)
