@@ -31,6 +31,9 @@ class DepartmentsDataTable extends DataTable
                     </form>
                 ';
             })
+            ->editColumn('number_of_employees', function ($position) {
+                return $position->employees->count();
+            })
             ->rawColumns(['action'])
             ->setRowId('position_id');
     }
@@ -40,7 +43,7 @@ class DepartmentsDataTable extends DataTable
      */
     public function query(Department $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->with('employees');
     }
 
     /**
@@ -76,6 +79,8 @@ class DepartmentsDataTable extends DataTable
         return [
             Column::make('department_id')->title('Id'),
             Column::make('name'),
+            Column::computed('number_of_employees')
+            ->addClass('text-center no-search'),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)

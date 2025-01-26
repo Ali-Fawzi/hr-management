@@ -29,6 +29,9 @@ class PositionsDataTable extends DataTable
                     </form>
                 ';
             })
+            ->editColumn('number_of_employees', function ($position) {
+                return $position->employees->count();
+            })
             ->rawColumns(['action'])
             ->setRowId('position_id');
     }
@@ -38,7 +41,7 @@ class PositionsDataTable extends DataTable
      */
     public function query(Position $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->with('employees');
     }
 
     /**
@@ -75,6 +78,8 @@ class PositionsDataTable extends DataTable
             Column::make('position_id')->title('Id'),
             Column::make('title'),
             Column::make('description'),
+            Column::computed('number_of_employees')
+            ->addClass('text-center no-search'),
             Column::computed('action')
             ->exportable(false)
             ->printable(false)
