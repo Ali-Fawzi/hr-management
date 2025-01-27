@@ -60,7 +60,7 @@ A robust Laravel-based solution for comprehensive employee lifecycle management,
 
 ### Setup
 ```bash
-git clone https://github.com/yourrepo/employee-management.git
+git clone https://github.com/ali-fawzi/hr-management.git
 cd employee-management
 
 # Install dependencies
