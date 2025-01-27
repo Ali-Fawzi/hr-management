@@ -27,7 +27,6 @@ class Employee extends Model
         'salary',
         'driving_license_path',
         'background_check_path',
-        'other_documents_path',
         'photo_path',
         'status',
     ];
@@ -42,9 +41,6 @@ class Employee extends Model
             }
             if ($employee->background_check_path) {
                 Storage::disk('public')->delete($employee->background_check_path);
-            }
-            if ($employee->other_documents_path) {
-                Storage::disk('public')->delete($employee->other_documents_path);
             }
             if ($employee->photo_path) {
                 Storage::disk('public')->delete($employee->photo_path);

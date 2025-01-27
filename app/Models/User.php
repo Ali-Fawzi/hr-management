@@ -75,4 +75,8 @@ class User extends Authenticatable
            ->logOnlyDirty()
            ->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}");
    }
+    public function scopeSupervisors($query)
+    {
+        return $query->role('Supervisor');
+    }
 }

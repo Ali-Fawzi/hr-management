@@ -152,16 +152,6 @@
                             @endif
                         </div>
             
-                        <!-- Other Documents -->
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700">Other Documents</label>
-                            @if ($employee->other_documents_path)
-                                <a href="{{ Storage::url($employee->other_documents_path) }}" target="_blank" class="text-blue-500 hover:underline">View File</a>
-                            @else
-                                <p class="text-gray-500">No file uploaded</p>
-                            @endif
-                        </div>
-            
                         <!-- Photo -->
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700">Photo</label>

@@ -23,7 +23,6 @@ return new class extends Migration
             $table->decimal('salary', 10, 2)->nullable(false);
             $table->string('driving_license_path')->nullable();
             $table->string('background_check_path')->nullable();
-            $table->string('other_documents_path')->nullable();
             $table->string('photo_path')->nullable();
             $table->enum('status', ['submitted', 'approved', 'rejected'])->default('submitted');
             $table->timestamps();

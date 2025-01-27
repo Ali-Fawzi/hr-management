@@ -10,6 +10,11 @@ use App\Models\User;
 use App\Notifications\NewEmployeeCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class EmployeeController extends Controller
 {
@@ -35,47 +40,53 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request)
     {
-        $validatedData = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|string|in:Male,Female,Other',
-            'department_id' => 'required|exists:department,department_id',
-            'position_id' => 'required|exists:position,position_id',
-            'salary' => 'required|numeric|min:0',
-            'driving_license_path' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-            'background_check_path' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-            'other_documents_path' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-            'photo_path' => 'nullable|image|mimes:jpg,png|max:2048',
-        ]);
-
-        if ($request->hasFile('driving_license_path')) {
-            $validatedData['driving_license_path'] = $request->file('driving_license_path')->store('driving_licenses', 'public');
+        $validatedData = $request->validated();
+        $filePaths = [];
+    
+        try {
+            DB::beginTransaction();
+    
+            $fileHandlingConfig = [
+                'driving_license_path' => 'driving_licenses',
+                'background_check_path' => 'background_checks',
+                'photo_path' => 'photos',
+            ];
+    
+            foreach ($fileHandlingConfig as $field => $directory) {
+                if ($request->hasFile($field)) {
+                    $path = $request->file($field)->store($directory, 'public');
+                    $validatedData[$field] = $path;
+                    $filePaths[] = $path;
+                }
+            }
+    
+            $employee = Employee::create($validatedData);
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+    
+            foreach ($filePaths as $path) {
+                Storage::disk('public')->delete($path);
+            }
+    
+            return redirect()->back()
+                ->with('error', __('Employee creation failed. Please try again.'))
+                ->withInput();
         }
-
-        if ($request->hasFile('background_check_path')) {
-            $validatedData['background_check_path'] = $request->file('background_check_path')->store('background_checks', 'public');
+    
+        try {
+            Notification::send(
+                User::supervisors()->get(),
+                new NewEmployeeCreated($employee)
+            );
+        } catch (\Exception $e) {
+            Log::error('Failed to send notifications: ' . $e->getMessage());
         }
-
-        if ($request->hasFile('other_documents_path')) {
-            $validatedData['other_documents_path'] = $request->file('other_documents_path')->store('other_documents', 'public');
-        }
-
-        if ($request->hasFile('photo_path')) {
-            $validatedData['photo_path'] = $request->file('photo_path')->store('photos', 'public');
-        }
-
-        $employee = Employee::create($validatedData);
-
-        $supervisors = User::role('Supervisor')->get();
-
-        foreach ($supervisors as $supervisor) {
-            $supervisor->notify(new NewEmployeeCreated($employee));
-        }
-
-        return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
+    
+        return redirect()->route('employees.index')
+            ->with('success', __('Employee created successfully.'));
     }
 
     /**
@@ -110,67 +121,68 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required|string|in:Male,Female',
-            'department_id' => 'required|exists:department,department_id',
-            'position_id' => 'required|exists:position,position_id',
-            'salary' => 'required|numeric',
-            'driving_license_path' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-            'background_check_path' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-            'other_documents_path' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-            'photo_path' => 'nullable|image|mimes:jpg,png|max:2048',
-        ]);
-
-        $employee = Employee::findOrFail($id);
-
-        if ($employee->status !== 'submitted') {
-            return redirect()->route('employees.index')->with('error', 'Employee cannot be updated.');
-        }
-
-        $employee->first_name = $request->input('first_name');
-        $employee->last_name = $request->input('last_name');
-        $employee->date_of_birth = $request->input('date_of_birth');
-        $employee->gender = $request->input('gender');
-        $employee->department_id = $request->input('department_id');
-        $employee->position_id = $request->input('position_id');
-        $employee->salary = $request->input('salary');
-
-        if ($request->hasFile('driving_license_path')) {
-            if ($employee->driving_license_path) {
-                Storage::delete($employee->driving_license_path);
+        $validatedData = $request->validated();
+        $newFilePaths = [];
+        $oldFiles = [];
+    
+        try {
+            DB::beginTransaction();
+    
+            $fileConfig = [
+                'driving_license_path' => [
+                    'disk' => 'public',
+                    'directory' => 'driving_licenses'
+                ],
+                'background_check_path' => [
+                    'disk' => 'public',
+                    'directory' => 'background_checks'
+                ],
+                'photo_path' => [
+                    'disk' => 'public',
+                    'directory' => 'photos',
+                    'is_image' => true
+                ]
+            ];
+    
+            foreach ($fileConfig as $field => $config) {
+                if ($request->hasFile($field)) {
+                    $path = $request->file($field)->store(
+                        $config['directory'], 
+                        $config['disk']
+                    );
+                    
+                    $oldFiles[$field] = $employee->$field;
+                    $newFilePaths[] = $path;
+                    $validatedData[$field] = $path;
+                }
             }
-            $employee->driving_license_path = $request->file('driving_license_path')->store('driving_licenses');
-        }
-
-        if ($request->hasFile('background_check_path')) {
-            if ($employee->background_check_path) {
-                Storage::delete($employee->background_check_path);
+    
+            $employee->update($validatedData);
+    
+            foreach ($oldFiles as $field => $path) {
+                if ($path) {
+                    Storage::disk($fileConfig[$field]['disk'])->delete($path);
+                }
             }
-            $employee->background_check_path = $request->file('background_check_path')->store('background_checks');
-        }
-
-        if ($request->hasFile('other_documents_path')) {
-            if ($employee->other_documents_path) {
-                Storage::delete($employee->other_documents_path);
+    
+            DB::commit();
+    
+            return redirect()->route('employees.index')
+                ->with('success', __('Employee updated successfully.'));
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            foreach ($newFilePaths as $path) {
+                Storage::disk('public')->delete($path);
             }
-            $employee->other_documents_path = $request->file('other_documents_path')->store('other_documents');
+    
+            return redirect()->back()
+                ->with('error', __('Employee update failed. Please try again.'))
+                ->withInput();
         }
-
-        if ($request->hasFile('photo_path')) {
-            if ($employee->photo_path) {
-                Storage::delete($employee->photo_path);
-            }
-            $employee->photo_path = $request->file('photo_path')->store('photos');
-        }
-
-        $employee->save();
-
-        return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
     }
 
     /**
@@ -179,26 +191,44 @@ class EmployeeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Employee $employee)
     {
-        $employee = Employee::findOrFail($id);
-
-        if ($employee->driving_license_path) {
-            Storage::delete($employee->driving_license_path);
+        $fileConfig = [
+            'driving_license_path' => ['disk' => 'public'],
+            'background_check_path' => ['disk' => 'public'],
+            'photo_path' => ['disk' => 'public']
+        ];
+    
+        try {
+            DB::beginTransaction();
+    
+            $filesToDelete = [];
+            foreach ($fileConfig as $field => $config) {
+                if ($employee->$field) {
+                    $filesToDelete[] = [
+                        'path' => $employee->$field,
+                        'disk' => $config['disk']
+                    ];
+                }
+            }
+    
+            $employee->delete();
+    
+            DB::commit();
+    
+            foreach ($filesToDelete as $file) {
+                Storage::disk($file['disk'])->delete($file['path']);
+            }
+    
+            return redirect()->route('employees.index')
+                ->with('success', __('Employee deleted successfully.'));
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return redirect()->back()
+                ->with('error', __('Employee deletion failed. Please try again.'));
         }
-        if ($employee->background_check_path) {
-            Storage::delete($employee->background_check_path);
-        }
-        if ($employee->other_documents_path) {
-            Storage::delete($employee->other_documents_path);
-        }
-        if ($employee->photo_path) {
-            Storage::delete($employee->photo_path);
-        }
-
-        $employee->delete();
-
-        return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
 
     public function approve(Employee $employee)

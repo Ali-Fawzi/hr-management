@@ -101,13 +101,6 @@
                                 <x-input-error :messages="$errors->get('background_check_path')" class="mt-2" />
                             </div>
                         
-                            <!-- Other Documents -->
-                            <div>
-                                <x-input-label for="other_documents_path" :value="__('Other Documents')" />
-                                <x-text-input id="other_documents_path" class="block mt-1 w-full" type="file" name="other_documents_path" />
-                                <x-input-error :messages="$errors->get('other_documents_path')" class="mt-2" />
-                            </div>
-                        
                             <!-- Photo -->
                             <div>
                                 <x-input-label for="photo_path" :value="__('Photo')" />
