@@ -14,12 +14,16 @@ class Employee extends Model implements ApprovableModel
 
     public function onApprovalCompleted(ProcessApproval $approval): bool
     {
-        return true;
+        if ($this->approvalStatus->current_step === 'Supervisor') {
+            $this->status = 'Approved';
+            return true;
+        }
+        return false;
     }
 
     protected $table = 'employee';
 
-    public bool $autoSubmit = true;
+    public bool $autoSubmit = false;
 
     protected $primaryKey = 'employee_id';
 

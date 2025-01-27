@@ -15,16 +15,12 @@ class RegistrationWorkflow extends Seeder
     {
         Employee::makeApprovable([
             [
-                'role_id' => 1,
-                'action' => ApprovalTypeEnum::APPROVE->value,
-            ],
-            [
-                'role_id' => 1,
-                'action' => ApprovalTypeEnum::CHECK->value,
-            ],
-            [
                 'role_id' => 2,
                 'action' => ApprovalTypeEnum::CHECK->value,
+            ],
+            [
+                'role_id' => 1,
+                'action' => ApprovalTypeEnum::APPROVE->value,
             ],
         ]);
     }

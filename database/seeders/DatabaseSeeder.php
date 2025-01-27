@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
             PermissionTableSeeder::class,
             UsersSeeder::class,
             RegistrationWorkflow::class,
+            PositionSeeder::class,
+            DepartmentSeeder::class,
         ]);
     }
 }
