@@ -97,7 +97,11 @@
                             <x-dropdown-link :href="route('notifications.index')">
                                 {{ __('Notifications') }}
                             </x-dropdown-link>
-            
+
+                            <x-dropdown-link :href="route('logs.index')">
+                                {{ __('Activity Logs') }}
+                            </x-dropdown-link>
+
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -168,6 +172,13 @@
                     {{ __('Profile') }}
                 </x-responsive-nav-link>
 
+                <x-responsive-nav-link :href="route('notifications.index')">
+                    {{ __('Notifications') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('logs.index')">
+                    {{ __('Activity Logs') }}
+                </x-responsive-nav-link>
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
