@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\EmployeesDataTable;
-use Illuminate\Http\Request;
-use App\Models\Employee;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Position;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
-     /**
+    /**
      * Display a listing of the resource.
      */
     public function index(EmployeesDataTable $dataTable)
@@ -49,25 +49,25 @@ class EmployeeController extends Controller
             'other_documents_path' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
             'photo_path' => 'nullable|image|mimes:jpg,png|max:2048',
         ]);
-    
+
         if ($request->hasFile('driving_license_path')) {
             $validatedData['driving_license_path'] = $request->file('driving_license_path')->store('driving_licenses', 'public');
         }
-    
+
         if ($request->hasFile('background_check_path')) {
             $validatedData['background_check_path'] = $request->file('background_check_path')->store('background_checks', 'public');
         }
-    
+
         if ($request->hasFile('other_documents_path')) {
             $validatedData['other_documents_path'] = $request->file('other_documents_path')->store('other_documents', 'public');
         }
-    
+
         if ($request->hasFile('photo_path')) {
             $validatedData['photo_path'] = $request->file('photo_path')->store('photos', 'public');
         }
-    
+
         Employee::create($validatedData);
-    
+
         return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
     }
 
@@ -78,7 +78,7 @@ class EmployeeController extends Controller
     {
         $employee = Employee::findOrFail($id);
 
-        return view('employees.show', compact('employee'));   
+        return view('employees.show', compact('employee'));
     }
 
     /**
@@ -100,7 +100,6 @@ class EmployeeController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

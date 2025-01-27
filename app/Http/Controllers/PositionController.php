@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTables\PositionsDataTable;
 use App\Models\Position;
 use Illuminate\Http\Request;
-use App\DataTables\PositionsDataTable;
 
 class PositionController extends Controller
 {
@@ -68,6 +68,7 @@ class PositionController extends Controller
     public function destroy(Position $position)
     {
         $position->delete();
+
         return redirect()->route('positions.index')->with('success', 'Position deleted successfully.');
     }
 }

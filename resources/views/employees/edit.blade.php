@@ -130,7 +130,7 @@
                             </div>
                         
                             <!-- Submit Button -->
-                            <div>
+                            <div class="md:col-span-2 mx-auto">
                                 <x-primary-button>
                                     {{ __('Update Employee') }}
                                 </x-primary-button>

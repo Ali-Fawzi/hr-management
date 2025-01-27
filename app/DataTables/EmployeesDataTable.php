@@ -15,25 +15,28 @@ class EmployeesDataTable extends DataTable
     /**
      * Build the DataTable class.
      *
-     * @param QueryBuilder $query Results from query() method.
+     * @param  QueryBuilder  $query  Results from query() method.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-        ->addColumn('action', function ($employee) {
-            return '
-                <a href="' . route('employees.show', $employee->employee_id) . '" class="btn btn-sm">
+            ->addColumn('action', function ($employee) {
+                return '
+                <a href="'.route('employees.show', $employee->employee_id).'" class="btn btn-sm">
                     <i class="bi bi-eye-fill text-primary"></i>
                 </a>
             ';
-        })
-        ->editColumn('position', function ($employee) {
-            return $employee->position->title;
-        })
-        ->editColumn('department', function ($employee) {
-            return $employee->department->name;
-        })
-        ->rawColumns(['action'])
+            })
+            ->editColumn('position', function ($employee) {
+                return $employee->position->title;
+            })
+            ->editColumn('department', function ($employee) {
+                return $employee->department->name;
+            })
+            ->editColumn('registration_summary', function ($employee) {
+                return $employee->getApprovalSummaryUI();
+            })
+            ->rawColumns(['action', 'registration_summary'])
             ->setRowId('id');
     }
 
@@ -51,23 +54,23 @@ class EmployeesDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('employees-table')
-                    ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    ->orderBy(1)
-                    ->selectStyleSingle()
-                    ->responsive()
-                    ->buttons([
-                        Button::make('add'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload'),
-                    ])
-                    ->parameters([
-                        'order' => [[0, 'asc']],
-                        'dom' => '<"top mb-2"Bfl>rt<"bottom d-flex align-items-center justify-content-between mt-3"ip>',
-                    ])
-                    ->select(false);
+            ->setTableId('employees-table')
+            ->columns($this->getColumns())
+            ->minifiedAjax()
+            ->orderBy(1)
+            ->selectStyleSingle()
+            ->responsive()
+            ->buttons([
+                Button::make('add'),
+                Button::make('print'),
+                Button::make('reset'),
+                Button::make('reload'),
+            ])
+            ->parameters([
+                'order' => [[0, 'asc']],
+                'dom' => '<"top mb-2"Bfl>rt<"bottom d-flex align-items-center justify-content-between mt-3"ip>',
+            ])
+            ->select(false);
     }
 
     /**
@@ -80,11 +83,14 @@ class EmployeesDataTable extends DataTable
             Column::make('first_name'),
             Column::make('last_name'),
             Column::make('position')
-            ->searchable(false)
-            ->orderable(false),
+                ->searchable(false)
+                ->orderable(false),
             Column::make('department')
-            ->searchable(false)
-            ->orderable(false),
+                ->searchable(false)
+                ->orderable(false),
+            Column::make('registration_summary')
+                ->searchable(false)
+                ->orderable(false),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)
@@ -98,6 +104,6 @@ class EmployeesDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'Employees_' . date('Y-m-d H:i:s');
+        return 'Employees_'.date('Y-m-d H:i:s');
     }
 }

@@ -11,12 +11,15 @@ use RingleSoft\LaravelProcessApproval\Traits\Approvable;
 class Employee extends Model implements ApprovableModel
 {
     use Approvable;
-    
+
     public function onApprovalCompleted(ProcessApproval $approval): bool
     {
-        return true;   
+        return true;
     }
+
     protected $table = 'employee';
+
+    public bool $autoSubmit = true;
 
     protected $primaryKey = 'employee_id';
 
@@ -36,6 +39,7 @@ class Employee extends Model implements ApprovableModel
         'other_documents_path',
         'photo_path',
     ];
+
     protected static function boot()
     {
         parent::boot();
@@ -55,6 +59,7 @@ class Employee extends Model implements ApprovableModel
             }
         });
     }
+
     public function department()
     {
         return $this->belongsTo(Department::class, 'department_id', 'department_id');

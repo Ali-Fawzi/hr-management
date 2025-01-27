@@ -17,12 +17,12 @@ class PositionsDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($position) {
                 return '
-                    <a href="' . route('positions.edit', $position->position_id) . '" class="btn btn-sm">
+                    <a href="'.route('positions.edit', $position->position_id).'" class="btn btn-sm">
                         <i class="bi bi-pencil-fill text-primary"></i>
                     </a>
-                    <form action="' . route('positions.destroy', $position->position_id) . '" method="POST" style="display:inline;">
-                        ' . csrf_field() . '
-                        ' . method_field('DELETE') . '
+                    <form action="'.route('positions.destroy', $position->position_id).'" method="POST" style="display:inline;">
+                        '.csrf_field().'
+                        '.method_field('DELETE').'
                         <button type="submit" class="btn btn-sm" onclick="return confirm(\'Are you sure?\')">
                             <i class="bi bi-trash-fill text-danger"></i>
                         </button>
@@ -50,23 +50,23 @@ class PositionsDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-                    ->setTableId('job-positions-table')
-                    ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    ->orderBy(1)
-                    ->selectStyleSingle()
-                    ->responsive()
-                    ->buttons([
-                        Button::make('add'),
-                        Button::make('print'),
-                        Button::make('reset'),
-                        Button::make('reload'),
-                    ])
-                    ->parameters([
-                        'order' => [[0, 'asc']],
-                        'dom' => '<"top mb-2"Bfl>rt<"bottom d-flex align-items-center justify-content-between mt-3"ip>',
-                    ])
-                    ->select(false);
+            ->setTableId('job-positions-table')
+            ->columns($this->getColumns())
+            ->minifiedAjax()
+            ->orderBy(1)
+            ->selectStyleSingle()
+            ->responsive()
+            ->buttons([
+                Button::make('add'),
+                Button::make('print'),
+                Button::make('reset'),
+                Button::make('reload'),
+            ])
+            ->parameters([
+                'order' => [[0, 'asc']],
+                'dom' => '<"top mb-2"Bfl>rt<"bottom d-flex align-items-center justify-content-between mt-3"ip>',
+            ])
+            ->select(false);
     }
 
     /**
@@ -79,19 +79,20 @@ class PositionsDataTable extends DataTable
             Column::make('title'),
             Column::make('description'),
             Column::computed('number_of_employees')
-            ->addClass('text-center no-search'),
+                ->addClass('text-center no-search'),
             Column::computed('action')
-            ->exportable(false)
-            ->printable(false)
-            ->width(120)
-            ->addClass('text-center no-search'),
+                ->exportable(false)
+                ->printable(false)
+                ->width(120)
+                ->addClass('text-center no-search'),
         ];
     }
+
     /**
      * Get the filename for export.
      */
     protected function filename(): string
     {
-        return 'Positions_' . date('Y-m-d H:i:s');
+        return 'Positions_'.date('Y-m-d H:i:s');
     }
 }

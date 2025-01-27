@@ -53,7 +53,7 @@ class DepartmentController extends Controller
     public function update(Request $request, Department $department)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:department,name,' . $department->department_id . ',department_id',
+            'name' => 'required|string|max:255|unique:department,name,'.$department->department_id.',department_id',
         ]);
 
         $department->update($request->only(['name']));
@@ -67,6 +67,7 @@ class DepartmentController extends Controller
     public function destroy(Department $department)
     {
         $department->delete();
+
         return redirect()->route('departments.index')->with('success', 'Department deleted successfully.');
     }
 }
