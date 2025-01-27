@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Employee extends Model
 {
     use LogsActivity;
+
     protected $table = 'employee';
 
     protected $primaryKey = 'employee_id';
@@ -57,11 +58,12 @@ class Employee extends Model
     {
         return $this->belongsTo(Position::class, 'position_id', 'position_id');
     }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['status'])
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn(string $eventName) => "Employee {$eventName}");
+            ->setDescriptionForEvent(fn (string $eventName) => "Employee {$eventName}");
     }
 }

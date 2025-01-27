@@ -26,28 +26,19 @@ A robust Laravel-based solution for comprehensive employee lifecycle management,
 
 ### Advanced Architecture
 - Event-driven notifications
-- Queued background tasks
-- SOLID principle implementation
-- Repository pattern ready
-- Localization support (i18n)
+
 
 ## Technology Stack
 
 **Backend**
-- Laravel 10.x
+- Laravel 11.x
 - PHP 8.2+
 - MySQL 8.0+/PostgreSQL 14+ SQLite
-- Redis 7.x (Caching/Queues)
 
 **Frontend**
 - Blade Templates
 - Tailwind CSS 3.x
 - Alpine.js 3.x
-
-**DevOps**
-- Docker-compose setup
-- Horizon Monitoring
-- Cloud-ready storage
 
 ## Installation
 
@@ -133,12 +124,6 @@ REDIS_PORT=6379
 - Status Transition Validation
 - Notification Delivery
 
-**Testing Strategy**
-- Feature tests: 90% coverage
-- Unit tests: Core business logic
-- Browser tests: Critical user flows
-- Security tests: OWASP Top 10 coverage
-
 ## Security
 
 ### Implementation
@@ -152,31 +137,17 @@ REDIS_PORT=6379
   - Virus scanning integration
   - Temporary URL expiration
 
-### Best Practices
-- Regular dependency audits
-- Quarterly penetration tests
-- Automated security patches
-- RBAC with least privilege
-
 ## Audit & Monitoring
 
 **Tracking**
-- User activity logging
-- File access history
+- Activity logging
 - Status change trails
-- Authentication attempts
 
-**Tools**
-- Laravel Telescope (debugging)
-- Horizon (queue monitoring)
-- CloudWatch (production)
-- Custom audit dashboard
 
 ## Deployment
 
 **Production Requirements**
 - Isolated database instance
-- Redis cluster for queues
 - S3-compatible storage
 - SSL termination
 - Daily backups
@@ -189,25 +160,7 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Queue setup
-sudo supervisorctl start laravel-worker:*
 ```
-
-## Contributing
-
-1. Fork repository
-2. Create feature branch
-3. Submit PR with:
-   - Test coverage
-   - Documentation updates
-   - Migration files if needed
-   - Security review checklist
-
-**Coding Standards**
-- PSR-12 compliance
-- Laravel Pint configuration
-- PHPDoc annotations
-- Strict type declarations
 
 ---
 

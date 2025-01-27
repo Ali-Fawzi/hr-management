@@ -3,18 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\EmployeesDataTable;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\User;
 use App\Notifications\NewEmployeeCreated;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\StoreEmployeeRequest;
-use App\Http\Requests\UpdateEmployeeRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -44,16 +43,16 @@ class EmployeeController extends Controller
     {
         $validatedData = $request->validated();
         $filePaths = [];
-    
+
         try {
             DB::beginTransaction();
-    
+
             $fileHandlingConfig = [
                 'driving_license_path' => 'driving_licenses',
                 'background_check_path' => 'background_checks',
                 'photo_path' => 'photos',
             ];
-    
+
             foreach ($fileHandlingConfig as $field => $directory) {
                 if ($request->hasFile($field)) {
                     $path = $request->file($field)->store($directory, 'public');
@@ -61,30 +60,30 @@ class EmployeeController extends Controller
                     $filePaths[] = $path;
                 }
             }
-    
+
             $employee = Employee::create($validatedData);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-    
+
             foreach ($filePaths as $path) {
                 Storage::disk('public')->delete($path);
             }
-    
+
             return redirect()->back()
                 ->with('error', __('Employee creation failed. Please try again.'))
                 ->withInput();
         }
-    
+
         try {
             Notification::send(
                 User::supervisors()->get(),
                 new NewEmployeeCreated($employee)
             );
         } catch (\Exception $e) {
-            Log::error('Failed to send notifications: ' . $e->getMessage());
+            Log::error('Failed to send notifications: '.$e->getMessage());
         }
-    
+
         return redirect()->route('employees.index')
             ->with('success', __('Employee created successfully.'));
     }
@@ -126,59 +125,59 @@ class EmployeeController extends Controller
         $validatedData = $request->validated();
         $newFilePaths = [];
         $oldFiles = [];
-    
+
         try {
             DB::beginTransaction();
-    
+
             $fileConfig = [
                 'driving_license_path' => [
                     'disk' => 'public',
-                    'directory' => 'driving_licenses'
+                    'directory' => 'driving_licenses',
                 ],
                 'background_check_path' => [
                     'disk' => 'public',
-                    'directory' => 'background_checks'
+                    'directory' => 'background_checks',
                 ],
                 'photo_path' => [
                     'disk' => 'public',
                     'directory' => 'photos',
-                    'is_image' => true
-                ]
+                    'is_image' => true,
+                ],
             ];
-    
+
             foreach ($fileConfig as $field => $config) {
                 if ($request->hasFile($field)) {
                     $path = $request->file($field)->store(
-                        $config['directory'], 
+                        $config['directory'],
                         $config['disk']
                     );
-                    
+
                     $oldFiles[$field] = $employee->$field;
                     $newFilePaths[] = $path;
                     $validatedData[$field] = $path;
                 }
             }
-    
+
             $employee->update($validatedData);
-    
+
             foreach ($oldFiles as $field => $path) {
                 if ($path) {
                     Storage::disk($fileConfig[$field]['disk'])->delete($path);
                 }
             }
-    
+
             DB::commit();
-    
+
             return redirect()->route('employees.index')
                 ->with('success', __('Employee updated successfully.'));
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             foreach ($newFilePaths as $path) {
                 Storage::disk('public')->delete($path);
             }
-    
+
             return redirect()->back()
                 ->with('error', __('Employee update failed. Please try again.'))
                 ->withInput();
@@ -196,36 +195,36 @@ class EmployeeController extends Controller
         $fileConfig = [
             'driving_license_path' => ['disk' => 'public'],
             'background_check_path' => ['disk' => 'public'],
-            'photo_path' => ['disk' => 'public']
+            'photo_path' => ['disk' => 'public'],
         ];
-    
+
         try {
             DB::beginTransaction();
-    
+
             $filesToDelete = [];
             foreach ($fileConfig as $field => $config) {
                 if ($employee->$field) {
                     $filesToDelete[] = [
                         'path' => $employee->$field,
-                        'disk' => $config['disk']
+                        'disk' => $config['disk'],
                     ];
                 }
             }
-    
+
             $employee->delete();
-    
+
             DB::commit();
-    
+
             foreach ($filesToDelete as $file) {
                 Storage::disk($file['disk'])->delete($file['path']);
             }
-    
+
             return redirect()->route('employees.index')
                 ->with('success', __('Employee deleted successfully.'));
-    
+
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return redirect()->back()
                 ->with('error', __('Employee deletion failed. Please try again.'));
         }
