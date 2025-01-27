@@ -28,10 +28,16 @@ class UsersSeeder extends Seeder
         $supervisorRole = Role::create(['name' => 'Supervisor']);
         $hrRole = Role::create(['name' => 'HR']);
 
-        $permissions = Permission::pluck('id', 'id')->all();
+        $permissions = Permission::pluck('id', 'name')->all();
+        $excludedPermissions = [
+            'employee-approve-reject',
+        ];
 
         $supervisorRole->syncPermissions($permissions);
-        $hrRole->syncPermissions($permissions);
+
+        $hrPermissions = array_diff_key($permissions, array_flip($excludedPermissions));
+
+        $hrRole->syncPermissions($hrPermissions);
 
         $supervisorUser->assignRole([$supervisorRole->id]);
         $hrUser->assignRole([$hrRole->id]);

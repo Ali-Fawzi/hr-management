@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
@@ -21,6 +22,13 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class, ['except' => ['show']]);
     Route::resource('positions', PositionController::class, ['except' => ['show']]);
     Route::resource('departments', DepartmentController::class, ['except' => ['show']]);
+
+    Route::middleware('can:employee-approve-reject')->group(function () {
+        Route::put('/employees/{employee}/approve', [EmployeeController::class, 'approve'])->name('employees.approve');
+        Route::put('/employees/{employee}/reject', [EmployeeController::class, 'reject'])->name('employees.reject');
+    });
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 });
 
 require __DIR__.'/auth.php';

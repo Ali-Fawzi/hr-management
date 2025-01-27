@@ -54,13 +54,7 @@
                                 </select>
                                 <x-input-error :messages="$errors->get('gender')" class="mt-2" />
                             </div>
-                        
-                            <!-- Hire Date -->
-                            <div>
-                                <x-input-label for="hire_date" :value="__('Hire Date')" />
-                                <x-text-input id="hire_date" class="block mt-1 w-full" type="date" name="hire_date" :value="old('hire_date')" required />
-                                <x-input-error :messages="$errors->get('hire_date')" class="mt-2" />
-                            </div>
+                    
                         
                             <!-- Department -->
                             <div>

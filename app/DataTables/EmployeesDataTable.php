@@ -33,10 +33,14 @@ class EmployeesDataTable extends DataTable
             ->editColumn('department', function ($employee) {
                 return $employee->department->name;
             })
-            ->editColumn('registration_summary', function ($employee) {
-                return $employee->getApprovalSummaryUI();
+            ->editColumn('status', function ($employee) {
+                return $employee->status === 'submitted'
+                ? '<span class="badge bg-warning">submitted</span>'
+                : ($employee->status === 'approved'
+                    ? '<span class="badge bg-success">approved</span>'
+                    : '<span class="badge bg-danger">rejected</span>');
             })
-            ->rawColumns(['action', 'registration_summary'])
+            ->rawColumns(['action', 'registration_summary', 'status'])
             ->setRowId('id');
     }
 
@@ -45,7 +49,7 @@ class EmployeesDataTable extends DataTable
      */
     public function query(Employee $model): QueryBuilder
     {
-        return $model->with(['department', 'position']);
+        return $model->with(['department', 'position'])->where('status', '!=', 'approved');
     }
 
     /**
@@ -67,7 +71,7 @@ class EmployeesDataTable extends DataTable
                 Button::make('reload'),
             ])
             ->parameters([
-                'order' => [[0, 'asc']],
+                'order' => [[5, 'dsc']],
                 'dom' => '<"top mb-2"Bfl>rt<"bottom d-flex align-items-center justify-content-between mt-3"ip>',
             ])
             ->select(false);
@@ -88,9 +92,7 @@ class EmployeesDataTable extends DataTable
             Column::make('department')
                 ->searchable(false)
                 ->orderable(false),
-            Column::make('registration_summary')
-                ->searchable(false)
-                ->orderable(false),
+            Column::make('status'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

@@ -4,26 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use RingleSoft\LaravelProcessApproval\Contracts\ApprovableModel;
-use RingleSoft\LaravelProcessApproval\Models\ProcessApproval;
-use RingleSoft\LaravelProcessApproval\Traits\Approvable;
 
-class Employee extends Model implements ApprovableModel
+class Employee extends Model
 {
-    use Approvable;
-
-    public function onApprovalCompleted(ProcessApproval $approval): bool
-    {
-        if ($this->approvalStatus->current_step === 'Supervisor') {
-            $this->status = 'Approved';
-            return true;
-        }
-        return false;
-    }
-
     protected $table = 'employee';
-
-    public bool $autoSubmit = false;
 
     protected $primaryKey = 'employee_id';
 
@@ -42,6 +26,7 @@ class Employee extends Model implements ApprovableModel
         'background_check_path',
         'other_documents_path',
         'photo_path',
+        'status',
     ];
 
     protected static function boot()

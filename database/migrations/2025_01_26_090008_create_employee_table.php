@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('last_name', 255)->nullable(false);
             $table->date('date_of_birth')->nullable(false);
             $table->string('gender', 10)->nullable(false);
-            $table->date('hire_date')->nullable(false);
+            $table->date('hire_date')->nullable();
             $table->unsignedBigInteger('department_id')->nullable(false);
             $table->unsignedBigInteger('position_id')->nullable(false);
             $table->decimal('salary', 10, 2)->nullable(false);
@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('background_check_path')->nullable();
             $table->string('other_documents_path')->nullable();
             $table->string('photo_path')->nullable();
+            $table->enum('status', ['submitted', 'approved', 'rejected'])->default('submitted');
             $table->timestamps();
 
             $table->foreign('department_id')->references('department_id')->on('department')->onDelete('cascade');

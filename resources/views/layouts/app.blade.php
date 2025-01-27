@@ -39,6 +39,41 @@
         <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
         <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
         <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
-        @stack('scripts')    
+        @stack('scripts')  
+        <script>
+            const notificationButton = document.getElementById('notificationButton');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+        
+            notificationButton.addEventListener('click', function(event) {
+                event.stopPropagation();
+                notificationDropdown.classList.toggle('hidden');
+            });
+        
+            document.addEventListener('click', function(event) {
+                if (!notificationDropdown.contains(event.target) && !notificationButton.contains(event.target)) {
+                    notificationDropdown.classList.add('hidden');
+                }
+            });
+        
+            function markAsRead(notificationId) {
+                fetch('/notifications/mark-as-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ id: notificationId })
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.success) {
+                          const notificationElement = document.querySelector(`[data-notification-id="${notificationId}"]`);
+                          if (notificationElement) {
+                              notificationElement.remove();
+                          }
+                          window.location.reload();
+                      }
+                  });
+            }
+        </script>
     </body>
 </html>

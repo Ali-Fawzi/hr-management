@@ -6,6 +6,8 @@ use App\DataTables\EmployeesDataTable;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Position;
+use App\Models\User;
+use App\Notifications\NewEmployeeCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -40,7 +42,6 @@ class EmployeeController extends Controller
             'last_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
             'gender' => 'required|string|in:Male,Female,Other',
-            'hire_date' => 'required|date',
             'department_id' => 'required|exists:department,department_id',
             'position_id' => 'required|exists:position,position_id',
             'salary' => 'required|numeric|min:0',
@@ -66,7 +67,13 @@ class EmployeeController extends Controller
             $validatedData['photo_path'] = $request->file('photo_path')->store('photos', 'public');
         }
 
-        Employee::create($validatedData);
+        $employee = Employee::create($validatedData);
+
+        $supervisors = User::role('Supervisor')->get();
+
+        foreach ($supervisors as $supervisor) {
+            $supervisor->notify(new NewEmployeeCreated($employee));
+        }
 
         return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
     }
@@ -110,7 +117,6 @@ class EmployeeController extends Controller
             'last_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
             'gender' => 'required|string|in:Male,Female',
-            'hire_date' => 'required|date',
             'department_id' => 'required|exists:department,department_id',
             'position_id' => 'required|exists:position,position_id',
             'salary' => 'required|numeric',
@@ -122,11 +128,14 @@ class EmployeeController extends Controller
 
         $employee = Employee::findOrFail($id);
 
+        if ($employee->status !== 'submitted') {
+            return redirect()->route('employees.index')->with('error', 'Employee cannot be updated.');
+        }
+
         $employee->first_name = $request->input('first_name');
         $employee->last_name = $request->input('last_name');
         $employee->date_of_birth = $request->input('date_of_birth');
         $employee->gender = $request->input('gender');
-        $employee->hire_date = $request->input('hire_date');
         $employee->department_id = $request->input('department_id');
         $employee->position_id = $request->input('position_id');
         $employee->salary = $request->input('salary');
@@ -190,5 +199,31 @@ class EmployeeController extends Controller
         $employee->delete();
 
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
+    }
+
+    public function approve(Employee $employee)
+    {
+        if (! auth()->user()->can('employee-approve-reject')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($employee->status === 'submitted') {
+            $employee->update(['status' => 'approved']);
+        }
+
+        return redirect()->back()->with('success', 'Employee approved successfully.');
+    }
+
+    public function reject(Employee $employee)
+    {
+        if (! auth()->user()->can('employee-approve-reject')) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($employee->status === 'submitted') {
+            $employee->update(['status' => 'rejected']);
+        }
+
+        return redirect()->back()->with('success', 'Employee rejected successfully.');
     }
 }

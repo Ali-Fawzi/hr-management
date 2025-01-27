@@ -9,14 +9,53 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
+                    @if (session('success'))
+                        <p
+                            x-data="{ show: true }"
+                            x-show="show"
+                            x-transition
+                            x-init="setTimeout(() => show = false, 2000)"
+                            class="text-sm text-green-500"
+                        >{{ __(session('success')) }}</p>
+                    @elseif (session('error'))
+                        <p
+                            x-data="{ show: true }"
+                            x-show="show"
+                            x-transition
+                            x-init="setTimeout(() => show = false, 2000)"
+                            class="text-sm text-red-500"
+                        >{{ __(session('error')) }}</p>
+                    @endif
                     <div class="flex justify-between mb-4">
                         <a class="btn" href="{{ route('employees.index') }}">
                             <i class="bi bi-chevron-left"></i>
                         </a>
-                        @can('employee-edit')
+                        @can('employee-approve-reject')
+                            @if($employee->status === 'submitted')
+                                <div>
+                                    <form action="{{ route('employees.approve', $employee->employee_id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to approve this employee?')">
+                                            <i class="bi bi-check-circle-fill"></i> Approve
+                                        </button>
+                                    </form>
+    
+                                    <form action="{{ route('employees.reject', $employee->employee_id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to reject this employee?')">
+                                            <i class="bi bi-x-circle-fill"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            @endif
+                        @elsecan('employee-edit')
+                        @if($employee->status === 'submitted')
                             <a class="btn" href="{{ route('employees.edit', $employee->employee_id) }}">
-                                <i class="bi bi-pencil-fill text-primary"></i>
+                                <i class="bi bi-pencil-fill text-primary"></i> 
                             </a>
+                        @endif
                         @endcan
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -45,11 +84,31 @@
                         </div>
             
                         <!-- Hire Date -->
+                        @if ($employee->hire_date)
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Hire Date</label>
+                                <p class="mt-1 text-lg text-gray-900">{{ $employee->hire_date }}</p>
+                            </div>
+                        @endif
+
+                        <!-- Submit Date -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">Hire Date</label>
-                            <p class="mt-1 text-lg text-gray-900">{{ $employee->hire_date }}</p>
+                            <label class="block text-sm font-medium text-gray-700">Submit Date</label>
+                            <p class="mt-1 text-lg text-gray-900">{{ $employee->created_at }}</p>
                         </div>
-            
+
+                        <!-- Status -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status</label>
+                            <span class="m-1 font-medium me-2 px-2.5 py-1 rounded-sm 
+                                @if($employee->status === 'submitted') bg-yellow-100 text-yellow-800 
+                                @elseif($employee->status === 'approved') bg-green-100 text-green-800 
+                                @elseif($employee->status === 'rejected') bg-red-100 text-red-800 
+                                @endif">
+                                    {{ $employee->status }}
+                            </span>
+                        </div>
+
                         <!-- Department -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Department</label>
@@ -114,7 +173,6 @@
                         </div>
                     </div>
                 </div>
-                <x-ringlesoft-approval-actions :model="$employee" />
             </div>
         </div>
     </div>
