@@ -8,8 +8,6 @@ use App\Models\Employee;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Department;
 use App\Models\Position;
-use Illuminate\Support\Facades\Auth;
-use RingleSoft\LaravelProcessApproval\Models\ProcessApproval;
 
 class EmployeeController extends Controller
 {
@@ -68,17 +66,9 @@ class EmployeeController extends Controller
             $validatedData['photo_path'] = $request->file('photo_path')->store('photos', 'public');
         }
     
-        $employee = new Employee($validatedData);
-
-        dd(Employee::submitted()); // true or false
-
-        $result = $employee->submit();
-
-        if ($result instanceof ProcessApproval) {
-            return redirect()->route('employees.index')->with('success', 'Employee submitted for approval.');
-        } else {
-            return redirect()->back()->with('error', 'Failed to submit employee for approval.');
-        }
+        Employee::create($validatedData);
+    
+        return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
     }
 
     /**
